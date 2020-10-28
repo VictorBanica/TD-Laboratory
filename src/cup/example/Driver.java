@@ -14,7 +14,7 @@ class Driver {
 	    Reader r = new InputStreamReader(s);
 	    Lexer l = new Lexer(r);
 	    Symbol currentSymbol = null;
-	    while((currentSymbol=l.next_token()) != null) {
+	    while((currentSymbol=l.next_token()).sym != 0) {
 	        System.out.println("currentSymbol ="+ l.yytext());
 	    }	
 	}
