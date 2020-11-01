@@ -1,1 +1,1 @@
-<body><table><h2></h2></table></body>
+<html><body><table><h2></h2></table></body></html>

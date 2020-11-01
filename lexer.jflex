@@ -94,7 +94,9 @@ Comment = "<!--" [^*] ~"-->"
       "</h6"			                { return symbol(sym.h6Close); }
       "<hr"			                  { return symbol(sym.hr); }
       "<br"			                  { return symbol(sym.br); }
-
+      "<html"			                  { return symbol(sym.htmlOpen); }
+      "</html"			                  { return symbol(sym.htmlClose); }
+      
       /* HTML Core Attributes */
       
       "class="			                { return symbol(sym.cls); }

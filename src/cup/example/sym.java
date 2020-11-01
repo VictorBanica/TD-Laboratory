@@ -211,6 +211,8 @@ public interface sym {
   public static final int clear = 169;
   public static final int onload = 170;
   
+  public static final int htmlOpen = 171;
+  public static final int htmlClose = 172;
   
   
   
