@@ -28,32 +28,76 @@ init with {:
   } 
   lexer = new Lexer(f,fis);
 :};
+
+
 scan with {: return lexer.next_token(); :};
 
 /* Terminals (tokens returned by the scanner). */
-terminal            SEMI, PLUS, MINUS, UMINUS, TIMES, LPAREN, RPAREN;
-terminal Integer    NUMBER;        // our scanner provides numbers as integers
+terminal            TIMES, LPAREN, RPAREN, htmlOpen, htmlClose, h1Open, endTag, h1Close, bodyOpen, bodyClose;
+terminal            framesetOpen,framesetClose,noframesOpen,noframesClose;
+terminal            formOpen,formClose,selectOpen,selectClose,optionOpen,optionClose,tableOpen,tableClose;
+terminal            trOpen,trClose,tdOpen,tdClose,thOpen,thClose,aOpen,aClose;
+terminal 			ulOpen,ulClose,liOpen,liClose,olOpen,olClose,pOpen,pClose,iOpen,iClose,uOpen,uClose,smallOpen;
+terminal            smallClose,supOpen,supClose,subOpen,subClose,centerOpen,centerClose;
+terminal 			fontOpen,fontClose,h2Open,h2Close,h3Open,h3Close,h4Open,h4Close,h5Open,h5Close,h6Open,h6Close,bClose,bOpen,headOpen,headClose;
+terminal 			hr,text,frameOpen,basefontOpen,basefontClose,dirOpen,dirClose,divOpen,divClose;
+terminal 			colgroupOpen,colgroupClose,tbody,thread,fieldsetOpen,fieldsetClose,captionOpen,captionClose;			
 
-/* Non terminals */
 non terminal            expr_list;
-non terminal Integer    expr;      // used to store evaluated subexpressions
+non terminal Character    expr;  
+    
+non terminal HTML_DOCUMENT, html_tag, html_content, head_tag, head_content, body_tag;
+non terminal body_content, heading, frameset_tag, frameset_content, h1_tag, h2_tag, h3_tag, h4_tag, h5_tag, h6_tag;
+non terminal block, block_content, basefont_tag, center_tag, dir_tag, li_tag, flow, flow_content;
+non terminal div_tag, form_tag, form_content, fieldset_tag, caption_tag, listing_tag, ol_tag, p_tag;
+non terminal th_tag, ul_tag, a_content, a_tag, table_tag, colgroup_tag, table_content, colgroup_content;
+non terminal tr_tag, table_cell, td_tag;
 
-/* Precedences */
-precedence left PLUS, MINUS;
-precedence left TIMES;
-precedence left UMINUS;
+             
+HTML_DOCUMENT ::= html_tag;
+html_tag ::= htmlOpen endTag html_content htmlClose;
+html_content ::= head_tag body_tag | head_tag frameset_tag ;
+head_tag ::= headOpen endTag head_content headClose;			
+head_content ::= expr:text;
+body_tag ::= bodyOpen endTag body_content bodyClose;
+body_content ::= hr |text |heading |block;
+heading ::= h1_tag | h2_tag|h3_tag|h4_tag|h5_tag|h6_tag;
+frameset_tag ::= framesetOpen endTag frameset_content framesetClose; 
+frameset_content ::= frameOpen endTag;
+h1_tag ::= h1Open endTag expr:text h1Close;
+h2_tag ::= h1Open endTag expr:text h2Close;
+h3_tag ::= h1Open endTag expr:text h3Close;
+h4_tag ::= h1Open endTag expr:text h4Close;
+h5_tag ::= h1Open endTag expr:text h5Close;
+h6_tag ::= h1Open endTag expr:text h6Close;
+block ::= block_content;
+block_content ::= basefont_tag |center_tag | dir_tag | div_tag| form_tag | listing_tag |ol_tag|p_tag|table_tag|ul_tag;
+basefont_tag ::= basefontOpen endTag body_content basefontClose;
+center_tag ::= centerOpen endTag body_content centerClose;
+dir_tag ::= dirOpen endTag li_tag dirClose;
+li_tag ::= liOpen endTag flow liClose;
+flow ::= flow_content;
+flow_content ::= block | expr:text;
+div_tag ::= divOpen endTag body_content divClose;
+form_tag ::= formOpen endTag form_content formClose;
+form_content ::= body_content;
+listing_tag ::= liOpen endTag expr:text liClose;
+ol_tag ::= olOpen endTag li_tag olClose;
+p_tag ::= pOpen endTag text pClose;
+table_tag ::= tableOpen endTag caption_tag colgroup_tag table_content tableClose;
+caption_tag ::= captionOpen endTag body_content captionClose;
+colgroup_tag ::= colgroupOpen endTag colgroup_content colgroupClose;
+colgroup_content ::= expr:text;
+table_content ::= tbody | thread | tr_tag;
+tr_tag ::= trOpen endTag table_cell trClose;
+table_cell ::= td_tag | th_tag ;
+td_tag ::= tdOpen body_content tdClose;
+th_tag ::= thOpen body_content tdClose;
+ul_tag ::= ulOpen endTag li_tag ulClose;
+a_tag ::= aOpen endTag a_content aClose;
+a_content ::= heading | expr:text;
 
-/* The grammar rules */
-expr_list ::= expr_list expr:e SEMI         {: System.out.println(e); :}
-            | expr:e SEMI                   {: System.out.println(e); :}
-            ;
-            
-expr      ::= expr:e1 PLUS  expr:e2         {: RESULT = e1+e2;        :}
-             | expr:e1 MINUS expr:e2        {: RESULT = e1-e2;        :}
-             | expr:e1 TIMES expr:e2        {: RESULT = e1*e2;        :}
-             | MINUS expr:e                 {: RESULT = -e;           :}
-             %prec UMINUS
-             | LPAREN expr:e RPAREN	         {: RESULT = e;           :}
-             | NUMBER:n	                     {: RESULT = n;           :}
-             ;
-       
+
+
+
+

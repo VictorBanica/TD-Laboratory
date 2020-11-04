@@ -15,7 +15,7 @@ class Driver {
 	    Lexer l = new Lexer(r);
 	    Symbol currentSymbol = null;
 	    while((currentSymbol=l.next_token()).sym != 0) {
-	        System.out.println("currentSymbol ="+ l.yytext());
+	        System.out.println("currentSymbol = "+ l.yytext());
 	    }	
 	}
 }
