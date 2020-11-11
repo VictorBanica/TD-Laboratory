@@ -15,7 +15,7 @@
 	    <cup srcfile="${base}/parser.cup"  destdir="${java}"
 	          parser="Parser"
 			  interface="true"
-	  	      locations="true"
+	  	      locations="false"
 	          debugsymbols="true" />
 	  	<jflex  file="lexer.jflex" destdir="${java}" />
 	  </target>

@@ -9,13 +9,16 @@ import java_cup.runtime.*;
 
 class Driver {
 
-	public static void main(String[] args) throws Exception {
-		InputStream s = new FileInputStream("input.txt");
-	    Reader r = new InputStreamReader(s);
-	    Lexer l = new Lexer(r);
-	    Symbol currentSymbol = null;
-	    while((currentSymbol=l.next_token()).sym != 0) {
-	        System.out.println("currentSymbol = "+ l.yytext());
-	    }	
-	}
+    public static void main(String[] args) throws Exception {
+        /*InputStream s = new FileInputStream("input.txt");
+        Reader r = new InputStreamReader(s);
+        Lexer l = new Lexer(r);
+        Symbol currentSymbol = null;
+        while((currentSymbol=l.next_token()).sym != 0) {
+        	System.out.println("currentSymbol = "+ l.yytext());
+        }
+      }*/
+       Parser parser = new Parser();
+       parser.parse();
+    }
 }

@@ -1,6 +1,8 @@
-    
+package cup.example; 
 import java_cup.runtime.Symbol;
-    
+import java_cup.runtime.ComplexSymbolFactory.*;
+import java.io.InputStream;
+import java_cup.runtime.ComplexSymbolFactory;
 %%
 
 %class Lexer
@@ -11,15 +13,45 @@ import java_cup.runtime.Symbol;
 %column
 
 %{
-    StringBuffer string = new StringBuffer();
 
-    private Symbol symbol(int type){
-        return new Symbol(type, yyline, yycolumn);
+	private ComplexSymbolFactory symbolFactory;
+	
+    public Lexer(ComplexSymbolFactory factory, InputStream in){
+    	this(new java.io.InputStreamReader(in));
+    	this.symbolFactory = factory;
     }
-    private Symbol symbol(int type, Object value){
-        return new Symbol(type, yyline, yycolumn, value);
+   
+    StringBuffer string = new StringBuffer();
+    
+    private Symbol symbol(int code){
+         int yylen = yylength();
+         Location left = new Location(yyline + 1, yycolumn + 1, yychar);
+         Location right = new Location(yyline + 1, yycolumn + yylen, yychar + yylen);
+         // Calculate symbol name
+         int max_code = sym.terminalNames.length;
+         String name = code < max_code ? sym.terminalNames[code] : "<UNKNOWN(" + yytext() + ")>";
+         	return this.symbolFactory.newSymbol(name, code, left, right);
+        //new Symbol(type, yyline, yycolumn);
+    }
+    private Symbol symbol(int code, Object value){
+         // Calculate symbol location
+    	 int yylen = yylength();
+         Location left = new Location(yyline + 1, yycolumn + 1, yychar);
+         Location right = new Location(yyline + 1, yycolumn + yylen, yychar + yylen);
+         // Calculate symbol name
+         int max_code = sym.terminalNames.length;
+         String name = code < max_code ? sym.terminalNames[code] : "<UNKNOWN(" + yytext() + ")>";
+        	 return this.symbolFactory.newSymbol(name, code, left, right, value);
+        //new Symbol(type, yyline, yycolumn, value);
     }
 %}
+
+
+%eofval{
+
+return symbol(sym.EOF);
+%eofval}
+
 
 Comment = "<!--" [^*] ~"-->" 
    
@@ -51,7 +83,7 @@ Comment = "<!--" [^*] ~"-->"
       "</td>"			                { return symbol(sym.tdClose); }
       "<th"			                  { return symbol(sym.thOpen); }
       "</th>"			                { return symbol(sym.thClose); }
-      "<thead"			              { return symbol(sym.thread); }
+      "<thead"			              { return symbol(sym.thead); }
       "<tbody"			              { return symbol(sym.tbody); }
       "<img"			                { return symbol(sym.img); }
       "<a"			                  { return symbol(sym.aOpen); }
@@ -96,129 +128,8 @@ Comment = "<!--" [^*] ~"-->"
       "<br"			                  { return symbol(sym.br); }
       "<html"			                  { return symbol(sym.htmlOpen); }
       "</html>"			                  { return symbol(sym.htmlClose); }
+      "<<EOF>>"                            { return symbol(sym.EOF); }	
       
-      /* HTML Core Attributes */
-      
-      "class="			                { return symbol(sym.cls); }
-      "dir="			                  { return symbol(sym.dir); }
-      "id="			                  { return symbol(sym.id); }
-      "lang="			                { return symbol(sym.lang); }
-      "onclick="			              { return symbol(sym.onclick); }
-      "ondblclick="                { return symbol(sym.ondblclick); }
-      "onkeydown="                 { return symbol(sym.onkeydown); }
-      "onkeypress="                { return symbol(sym.onkeypress); }
-      "onkeyup="                   { return symbol(sym.onkeyup); }
-      "onmousedown="               { return symbol(sym.onmousedown); }
-      "onmousemove="               { return symbol(sym.onmousemove); }
-      "onmouseout="                { return symbol(sym.onmouseout); }
-      "onmouseover="               { return symbol(sym.onmouseover); }
-      "onmouseup="                 { return symbol(sym.onmouseup); }
-      "style="			                { return symbol(sym.style); }
-      "title="			                { return symbol(sym.title); }
-
-     
-      /* HTML Tag Attributes */
-
-
-      "alink="                 { return symbol(sym.alink); }
-      "background="                 { return symbol(sym.background); }
-      "bgcolor="                 { return symbol(sym.bgcolor); }
-      "bgproperties="                 { return symbol(sym.bgproperties); }
-      "leftmargin="                 { return symbol(sym.leftmargin); }
-      "link="                 { return symbol(sym.link); }
-      "onblur="                 { return symbol(sym.onblur); }
-      "onfocus="                 { return symbol(sym.onfocus); }
-      "onload="                 { return symbol(sym.onload); }
-      "onunload="                 { return symbol(sym.onunload); }
-      "text="                 { return symbol(sym.text); }
-      "topmargin="                 { return symbol(sym.topmargin); }
-      "vlink="                 { return symbol(sym.vlink); }
-
-      "bordercolor="                 { return symbol(sym.bordercolor); }
-      "longdesc="                 { return symbol(sym.longdesc); }
-      "marginheight="                 { return symbol(sym.marginheight); }
-      "marginwidth="                 { return symbol(sym.marginwidth); }
-      "name="                 { return symbol(sym.name); }
-      "noresize"                 { return symbol(sym.noresize); }
-      "scrolling="                 { return symbol(sym.scrolling); }
-      "src="                 { return symbol(sym.src); }
-
-      "border="                 { return symbol(sym.border); }
-      "framespacing="                 { return symbol(sym.framespacing); }
-      "rows="                 { return symbol(sym.rows); }
-
-      "accept-charlist="          { return symbol(sym.acceptcharlist); }
-      "action="                 { return symbol(sym.action); }
-      "enctype="                 { return symbol(sym.enctype); }
-      "method="                 { return symbol(sym.method); }
-      "onreset="                 { return symbol(sym.onreset); }
-      "onsubmit="                 { return symbol(sym.onsubmit); }
-      "target="                 { return symbol(sym.target); }
-
-      "disabled"                 { return symbol(sym.disabled); }
-      "multiple"                 { return symbol(sym.multiple); }
-      "onchange="                 { return symbol(sym.onchange); }
-      "size="                 { return symbol(sym.size); }
-      "tabindex="                 { return symbol(sym.tabindex); }
-
-      "label="                 { return symbol(sym.label); }
-      "selected"                 { return symbol(sym.selected); }
-      "value="                 { return symbol(sym.value); }
-
-      "align="                 { return symbol(sym.align); }
-      "bordercolordark="                 { return symbol(sym.bordercolordark); }
-      "bordercolorlight="                 { return symbol(sym.bordercolorlight); }
-      "cellpadding="                 { return symbol(sym.cellpadding); }
-      "cellspacing="                 { return symbol(sym.cellspacing); }
-      "cols="                 { return symbol(sym.cols); }
-      "frame="                 { return symbol(sym.frame); }
-      "height="                 { return symbol(sym.height); }
-      "hspace="                 { return symbol(sym.hspace); }
-      "nowrap"                 { return symbol(sym.nowrap); }
-      "rules="                 { return symbol(sym.rules); }
-      "summary="                 { return symbol(sym.summary); }
-      "valign="                 { return symbol(sym.valign); }
-      "vspace="                 { return symbol(sym.vspace); }
-      "width="                 { return symbol(sym.width); }
-
-      "char="                 { return symbol(sym.chr); }
-      "abbr="                 { return symbol(sym.abbr); }
-      "axis="                 { return symbol(sym.axis); }
-      "charoff="                 { return symbol(sym.charoff); }
-      "colspan="                 { return symbol(sym.colspan); }
-      "headers="                 { return symbol(sym.headers); }
-      "rowspan="                 { return symbol(sym.rowspan); }
-      "scope="                 { return symbol(sym.scope); }
-
-      "alt="                 { return symbol(sym.alt); }
-      "controls"                 { return symbol(sym.controls); }
-      "dynsrc="                 { return symbol(sym.dynsrc); }
-      "ismap"                 { return symbol(sym.ismap); }
-      "loop="                 { return symbol(sym.loop); }
-      "lowsrc="                 { return symbol(sym.lowsrc); }
-      "onabort="                 { return symbol(sym.onabort); }
-      "onerror="                 { return symbol(sym.onerror); }
-      "start="                 { return symbol(sym.start); }
-      "usemap="                 { return symbol(sym.usemap); }
-
-      "accesskey="                 { return symbol(sym.accesskey); }
-      "charset="                   { return symbol(sym.charset); }
-      "coords="                 { return symbol(sym.coords); }
-      "href="                      { return symbol(sym.href); }
-      "hreflang="                  { return symbol(sym.hreflang); }
-      "rel="                       { return symbol(sym.rel); }
-      "rev="                       { return symbol(sym.rev); }
-      "shape="                     { return symbol(sym.shape); }
-      "tabindex="                  { return symbol(sym.tabindex); }
-      "target="                    { return symbol(sym.target); }
-      "type="                 { return symbol(sym.type); }
-
-      "compact"                 { return symbol(sym.compact); }
-      "face="                 { return symbol(sym.face); }
-      "color="                 { return symbol(sym.color); }
-      "noshade"                 { return symbol(sym.noshade); }
-      "clear="                 { return symbol(sym.clear); }
-
     }
     
     
